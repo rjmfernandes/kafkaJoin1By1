@@ -70,7 +70,7 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic STREAMED2 --fro
 If you monitor both streams STREAMED and STREAMED2 you will see the following:
 
 - If you insert d1 on topicA  you see immediately the d1 left only message on STREAMED
-- Insert now d2 on topicA you see immediately the d2 left only message on STREAMED and the d1 on STREAMED2
+- Insert now d2 on topicA you see immediately the d2 left only message on STREAMED and the d1 left only on STREAMED2
 - Insert now d3 on topicA and also d3 on topicB, you see on STREAMED both the left only d3 and the joined d3 while on STREAMED2 you see the left only d2 and the joined d3
 
 The way it looks: 
