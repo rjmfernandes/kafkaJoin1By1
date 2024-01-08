@@ -74,5 +74,5 @@ If you monitor both streams STREAMED and STREAMED2 you will see the following:
 - Insert now d3 on topicA and also d3 on topicB, you see on STREAMED both the left only d3 and the joined d3 while on STREAMED2 you see the left only d2 and the joined d3
 
 The way it looks: 
-- If you specify a grace period the left only will never be emited until some other event is consumed from left topic. And in case there is a join only the join even is emited.
+- If you specify a grace period the left only will never be emited until some other event is consumed from left topic. And in case there is a join only the join event is emited.
 - If you don't specify a grace period (deprecated) the left only is immediately emited independently of future join events being also emited when join is detected.
