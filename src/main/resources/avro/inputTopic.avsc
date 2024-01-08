@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "namespace": "io.confluent.csta.kafka1by1",
+  "name": "InputTopic",
+  "version": "1",
+  "fields": [
+    { "name": "id", "type": "string", "doc": "A Name" }
+  ]
+}
