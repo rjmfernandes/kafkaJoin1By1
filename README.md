@@ -128,7 +128,7 @@ work since during the ksqldb join processing it will potentially only work for o
 they would naturally correspond per partitioning being used).
 
 If you want to see this in action stop the DummyProducer and start io.confluent.csta.kafka1by1.avro.WrongDummyProducer
-(it uses DUMMY0 and DUMMY explicitly pointing tyo each partition even if naturally they would correspond both to 
+(it uses DUMMY0 and DUMMY1 explicitly pointing tyo each partition even if naturally they would correspond both to 
 partition 1) using as topic topicA then:
 
 - Insert into topicA e5 (it will hit partition 1) and immediately you will the left only event on STREAMED and if you 
