@@ -110,8 +110,9 @@ io.confluent.csta.kafka1by1.avro.DummyProducer using as topic topicA.
 You will see some left only dummy on the consumer of the streamed topics you can ignore. But anyway you can start seeing
 that with some delay those left only events are also being emitted on STREAMED2 now.
 
-- Insert d5 on topicA. You will see the left only d5 being emitted on STREAMED and if you wait more than the time window
-and grace period the left only event for d5 should also be emitted on STREAMED2.
+- Insert d5 on topicA (hits partition 0). You will see the left only d5 being emitted on STREAMED and if you wait more 
+than the time window and grace period the left only event for d5 should also be emitted on STREAMED2.
+- Insert d6 on topicA (hits partition 1). Again after 35s you should see also the left only join event on STREAMED2.
 
 If you check the code for io.confluent.csta.kafka1by1.avro.DummyProducer you can see that it explicitly has hardcoded
 certain keys to use for hitting each partition:
