@@ -40,33 +40,33 @@ Run again in parallel io.confluent.csta.kafka1by1.avro.AvroProducer but specify 
 
 Create on KSQLDB:
 
-```sql
-CREATE STREAM streamA (id VARCHAR)
+```
+CREATE STREAM streamA (original_id VARCHAR KEY)
     WITH (kafka_topic='topicA', partitions=2, value_format='avro');
 ```
 
-```sql
-CREATE STREAM streamB (id VARCHAR)
+```
+CREATE STREAM streamB (original_id VARCHAR KEY)
     WITH (kafka_topic='topicB', partitions=2, value_format='avro');
 ```
 
-```sql
+```
 CREATE STREAM streamed AS
      SELECT 
-        a.id as aid,
-        b.id as bid
+        a.original_id as aid,
+        b.original_id as bid
      FROM streamA a
-        LEFT JOIN streamB b WITHIN 30 SECONDS ON a.id = b.id
+        LEFT JOIN streamB b WITHIN 30 SECONDS ON a.original_id = b.original_id
      EMIT CHANGES;
 ```
 
-```sql     
+```     
 CREATE STREAM streamed2 AS
      SELECT 
-        a.id as aid,
-        b.id as bid
+        a.original_id as aid,
+        b.original_id as bid
      FROM streamA a
-        LEFT JOIN streamB b WITHIN 30 SECONDS GRACE PERIOD 5 SECONDS ON a.id = b.id
+        LEFT JOIN streamB b WITHIN 30 SECONDS GRACE PERIOD 5 SECONDS ON a.original_id = b.original_id
      EMIT CHANGES;
 ```
 
@@ -83,11 +83,11 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic STREAMED2 --fro
 If you monitor both streams STREAMED and STREAMED2 you will see the following:
 
 - If you insert d1 on topicA you see immediately the d1 left only message on STREAMED
-- After the window period and grace period has passed insert now d2 on topicA you see immediately the d2 left only
+- After 30s has passed insert now d2 on topicA you see immediately the d2 left only
   message on STREAMED and nothing yet on STREAMED2
-- Try now with d3 on topicA after waiting same time as before, and you should see now d2 left only also on STREAMED2 (it
+- Try now with d3 on topicA after 30s as before, and you should see now d2 left only also on STREAMED2 (it
   hit same partition as d3)
-- Insert After the window period and grace period has passed d4 on topicA and at right after d4 on topicB, you see on
+- Insert d4 on topicA and at right after d4 on topicB, you see on
   STREAMED both the left only d4 and the joined d4 while on STREAMED2 you see the left only d1 (it hit same partition as
   d4) and the joined d4
 
@@ -99,41 +99,20 @@ The way it looks:
   events being also emitted when join is detected.
 
 Basically the join streaming mode has changed from eager to lazy now with grace period being required.
-And at same time the time is controlled by the streaming time which requires new events to be consumed, without new
+And at same time the join is controlled by the streaming time which requires new events to be consumed, without new
 events the streaming time doesn't move forward and the last left only event standing is not emitted.
 
 A possible way to avoid this would be a dummy producer that guarantees to send events to all partitions.
 
 So let's run in parallel to our io.confluent.csta.kafka1by1.avro.AvroProducer execution instances an instance of
-io.confluent.csta.kafka1by1.avro.DummyProducer using as topic topicA.
+io.confluent.csta.kafka1by1.avro.SimpleDummyProducer using as topic topicA.
 
 You will see some left only dummy on the consumer of the streamed topics you can ignore. But anyway you can start seeing
 that with some delay those left only events are also being emitted on STREAMED2 now.
 
-- Insert d5 on topicA (hits partition 0). You will see the left only d5 being emitted on STREAMED and if you wait more 
-than the time window and grace period the left only event for d5 should also be emitted on STREAMED2.
-- Insert d6 on topicA (hits partition 1). Again after 35s you should see also the left only join event on STREAMED2.
+- Insert d5 on topicA (hits partition 0). You will see the left only d5 being emitted on STREAMED and if you wait 30s 
+  the left only event for d5 should also be emitted on STREAMED2.
+- Insert d6 on topicA (hits partition 1). Again after 30s (at most 37s) you should see also the left only join event on 
+  STREAMED2.
 
-If you check the code for io.confluent.csta.kafka1by1.avro.DummyProducer you can see that it explicitly has hardcoded
-certain keys to use for hitting each partition:
-
-```java
-private static final String[] DUMMY_KEYS= new String[] {"DUMMY2","DUMMY0"};
-```
-
-Those strings can be found by executing io.confluent.csta.kafka1by1.avro.DummyKeys that will send records with 
-DUMMY&lt;i&gt; with i from 0 to 20 so that on logs you can see to which partition each key is sent and pick one hitting 
-each partition. In this case we chose the two listed before. If you try in place of this to send any chosen key for a 
-partition explicitly as for example DUMMY0 and DUMMY1 (that naturally would both hit partition 1) it won't necessarily
-work since during the ksqldb join processing it will potentially only work for one of the partitions (the one for which 
-they would naturally correspond per partitioning being used).
-
-If you want to see this in action stop the DummyProducer and start io.confluent.csta.kafka1by1.avro.WrongDummyProducer
-(it uses DUMMY0 and DUMMY1 explicitly pointing tyo each partition even if naturally they would correspond both to 
-partition 1) using as topic topicA then:
-
-- Insert into topicA e5 (it will hit partition 1) and immediately you will the left only event on STREAMED and if you 
-wait 35s you will also see on STREAMED2. So far so good.
-- Insert now into topicA e6 (it will hit partition 0) and again you see on STREAMED but this time it will never show up 
-on STREAMED2 (at least until you send an event to partition 0 which key would correspond to partition 0 naturally).
 

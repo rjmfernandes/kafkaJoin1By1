@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.Scanner;
 
-public class WrongDummyProducer {
-    private static final Logger log = LoggerFactory.getLogger(WrongDummyProducer.class);
+public class SimpleDummyProducer {
+    private static final Logger log = LoggerFactory.getLogger(SimpleDummyProducer.class);
     private static boolean running = true;
     private static final long SLEEP_TIME_MS = 7000;
     private static final String DUMMY_ID="DUMMY";
