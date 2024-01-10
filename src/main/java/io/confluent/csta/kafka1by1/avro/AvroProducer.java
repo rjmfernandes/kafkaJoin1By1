@@ -43,7 +43,7 @@ public class AvroProducer {
                         .build();
 
                 //kafka producer - asynchronous writes
-                final ProducerRecord<String, InputTopic> record = new ProducerRecord<>(topic, id, inputTopicMessage);
+                ProducerRecord<String, InputTopic> record = new ProducerRecord<>(topic, id, inputTopicMessage);
                 //send with callback
                 producer.send(record, (metadata, e) -> {
                     if (e != null)

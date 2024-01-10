@@ -66,7 +66,7 @@ CREATE STREAM streamed2 AS
         a.original_id as aid,
         b.original_id as bid
      FROM streamA a
-        LEFT JOIN streamB b WITHIN 30 SECONDS GRACE PERIOD 5 SECONDS ON a.original_id = b.original_id
+        LEFT JOIN streamB b WITHIN 30 SECONDS GRACE PERIOD 60 SECONDS ON a.original_id = b.original_id
      EMIT CHANGES;
 ```
 
