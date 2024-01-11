@@ -1,5 +1,7 @@
 # Kafka Join 1 by 1
 
+This is in part discussed here: https://github.com/confluentinc/ksql/issues/9084
+
 Start CP including SR, Control Center and KSQLDB:
 
 ```bash
