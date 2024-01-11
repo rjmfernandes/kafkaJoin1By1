@@ -57,10 +57,10 @@ public class GracePeriodExplorer {
 
         joinEventsScenario("""
                 Insert into topicA event W.
-                Delay the double of grace period.
+                Delay 4x of grace period.
                 Insert into topicB event W with timestamp plus half the window time.
                 Click enter to execute.
-                 ""","W",TIME_WINDOW/2,2*GRACE_PERIOD,
+                 ""","W",TIME_WINDOW/2,4*GRACE_PERIOD,
                 scanner, producer);
 
     }
