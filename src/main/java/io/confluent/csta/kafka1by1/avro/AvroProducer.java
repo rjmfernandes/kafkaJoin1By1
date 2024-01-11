@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -39,7 +40,7 @@ public class AvroProducer {
                 System.out.println("Please input an id:");
                 String id = scanner.nextLine();
                 InputTopic inputTopicMessage = InputTopic.newBuilder()
-                        .setId(id)
+                        .setId(id).setJoiningDateTime(Instant.now())
                         .build();
 
                 //kafka producer - asynchronous writes
@@ -49,8 +50,9 @@ public class AvroProducer {
                     if (e != null)
                         log.info("Send failed for record {}", record, e);
                     else
-                        log.info("Sent key={}, id={} - Partition-{} - Offset {}", record.key(),
-                                record.value().getId(), metadata.partition(), metadata.offset());
+                        log.info("Sent key={}, id={}, time={} - Partition-{} - Offset {}", record.key(),
+                                record.value().getId(), record.value().getJoiningDateTime().getEpochSecond(),
+                                metadata.partition(), metadata.offset());
                 });
                 //sleep
                 Thread.sleep(SLEEP_TIME_MS);

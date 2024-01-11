@@ -1,4 +1,4 @@
-# Kafka Avro Producer and Join 1 by 1
+# Kafka Join 1 by 1
 
 Start CP including SR, Control Center and KSQLDB:
 
@@ -56,7 +56,7 @@ CREATE STREAM streamed AS
         a.original_id as aid,
         b.original_id as bid
      FROM streamA a
-        LEFT JOIN streamB b WITHIN 30 SECONDS ON a.original_id = b.original_id
+        LEFT JOIN streamB b WITHIN 15 SECONDS ON a.original_id = b.original_id
      EMIT CHANGES;
 ```
 
@@ -66,7 +66,7 @@ CREATE STREAM streamed2 AS
         a.original_id as aid,
         b.original_id as bid
      FROM streamA a
-        LEFT JOIN streamB b WITHIN 30 SECONDS GRACE PERIOD 60 SECONDS ON a.original_id = b.original_id
+        LEFT JOIN streamB b WITHIN 15 SECONDS GRACE PERIOD 20 SECONDS ON a.original_id = b.original_id
      EMIT CHANGES;
 ```
 
@@ -83,9 +83,9 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic STREAMED2 --fro
 If you monitor both streams STREAMED and STREAMED2 you will see the following:
 
 - If you insert d1 on topicA you see immediately the d1 left only message on STREAMED
-- After 30s has passed insert now d2 on topicA you see immediately the d2 left only
+- After 35s has passed insert now d2 on topicA you see immediately the d2 left only
   message on STREAMED and nothing yet on STREAMED2
-- Try now with d3 on topicA after 30s as before, and you should see now d2 left only also on STREAMED2 (it
+- Try now with d3 on topicA after 35s as before, and you should see now d2 left only also on STREAMED2 (it
   hit same partition as d3)
 - Insert d4 on topicA and at right after d4 on topicB, you see on
   STREAMED both the left only d4 and the joined d4 while on STREAMED2 you see the left only d1 (it hit same partition as
@@ -110,9 +110,8 @@ io.confluent.csta.kafka1by1.avro.SimpleDummyProducer using as topic topicA.
 You will see some left only dummy on the consumer of the streamed topics you can ignore. But anyway you can start seeing
 that with some delay those left only events are also being emitted on STREAMED2 now.
 
-- Insert d5 on topicA (hits partition 0). You will see the left only d5 being emitted on STREAMED and if you wait 30s 
-  the left only event for d5 should also be emitted on STREAMED2.
-- Insert d6 on topicA (hits partition 1). Again after 30s (at most 37s) you should see also the left only join event on 
+- Insert d5 on topicA (hits partition 0). You will see the left only d5 being emitted on STREAMED and if you wait 35s 
+to 42s the left only event for d5 should also be emitted on STREAMED2.
+- Insert d6 on topicA (hits partition 1). Again after 35s-42s you should see also the left only join event on 
   STREAMED2.
-
 

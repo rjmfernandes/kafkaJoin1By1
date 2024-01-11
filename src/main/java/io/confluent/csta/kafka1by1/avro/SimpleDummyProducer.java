@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Properties;
 import java.util.Scanner;
 
@@ -42,6 +43,7 @@ public class SimpleDummyProducer {
                 for(int partition=0;partition<NUMBER_OF_PARTITIONS;partition++) {
                     InputTopic inputTopicMessage = InputTopic.newBuilder()
                             .setId(DUMMY_ID+partition)
+                            .setJoiningDateTime(Instant.now())
                             .build();
                     ProducerRecord<String, InputTopic> record = new ProducerRecord<>(topic,partition,
                             DUMMY_ID+partition, inputTopicMessage);
@@ -49,8 +51,9 @@ public class SimpleDummyProducer {
                         if (e != null)
                             log.info("Send failed for dummy record {}", record, e);
                         else
-                            log.info("Sent dummy event key={}, id={} - Partition-{} - Offset {}", record.key(),
-                                    record.value().getId(), metadata.partition(), metadata.offset());
+                            log.info("Sent dummy event key={}, id={}, time={} - Partition-{} - Offset {}", record.key(),
+                                    record.value().getId(), record.value().getJoiningDateTime().getEpochSecond(),
+                                    metadata.partition(), metadata.offset());
                     });
                 }
                 //sleep

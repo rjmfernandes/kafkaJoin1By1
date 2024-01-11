@@ -4,6 +4,17 @@
   "name": "InputTopic",
   "version": "1",
   "fields": [
-    { "name": "id", "type": "string", "doc": "A Name" }
+    {
+      "name": "id",
+      "type": "string",
+      "doc": "A Name"
+    },
+    {
+      "name": "joiningDateTime",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
   ]
 }

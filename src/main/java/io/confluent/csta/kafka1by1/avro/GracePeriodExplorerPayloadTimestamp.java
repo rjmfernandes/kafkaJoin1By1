@@ -13,8 +13,8 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.Scanner;
 
-public class GracePeriodExplorer {
-    private static final Logger log = LoggerFactory.getLogger(GracePeriodExplorer.class);
+public class GracePeriodExplorerPayloadTimestamp {
+    private static final Logger log = LoggerFactory.getLogger(GracePeriodExplorerPayloadTimestamp.class);
     private static final int TIME_WINDOW = 15;
     private static final int GRACE_PERIOD = 20;
     private static final String TOPIC_A ="topicA";
@@ -22,7 +22,7 @@ public class GracePeriodExplorer {
 
     public static void main(String[] args) throws IOException {
         Properties properties = new Properties();
-        properties.load(GracePeriodExplorer.class.getResourceAsStream("/configuration.properties"));
+        properties.load(GracePeriodExplorerPayloadTimestamp.class.getResourceAsStream("/configuration.properties"));
         Scanner scanner = new Scanner(System.in);
         Producer<String, InputTopic> producer = new KafkaProducer<>(properties);
 
@@ -93,9 +93,9 @@ public class GracePeriodExplorer {
                                     Producer<String, InputTopic> producer) {
         InputTopic inputTopicMessage = InputTopic.newBuilder()
                 .setId(id)
-                .setJoiningDateTime(Instant.now())
+                .setJoiningDateTime(Instant.ofEpochMilli(timestamp))
                 .build();
-        ProducerRecord<String, InputTopic> record = new ProducerRecord<>(topic,null,timestamp,
+        ProducerRecord<String, InputTopic> record = new ProducerRecord<>(topic,
                 id, inputTopicMessage);
         producer.send(record, (metadata, e) -> {
             if (e != null)
