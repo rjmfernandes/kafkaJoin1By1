@@ -117,7 +117,7 @@ to 42s the left only event for d5 should also be emitted on STREAMED2.
 - Insert d6 on topicA (hits partition 1). Again after 35s-42s you should see also the left only join event on 
   STREAMED2.
 
-## Grace Period
+## Join Scenarios
 
 You can stop now the current java classes (both AvroProducers and the SimpleDummyProducer).
 
@@ -134,7 +134,7 @@ event enters into the partition or another event enters that it can do join.
 So now we can execute in parallel heartbeat coming from SimpleDummyProducer and execute again.
 No join will happen for W event anymore cause the left only event will be emitted before.
 
-### Payload Time
+## Payload Time
 
 The same behaviour can be seen using payload time. If you want to try this:
 
