@@ -31,6 +31,14 @@ public class GracePeriodExplorer {
                 Grace period assumed to be %ds.
                 %n""", TIME_WINDOW,GRACE_PERIOD);
 
+        /*joinEventsScenario("""
+                Insert into topicA event K.
+                Delay the time window plus 1.
+                Insert into topicB event K with timestamp window plus grace period.
+                Click enter to execute.
+                 ""","K",TIME_WINDOW+GRACE_PERIOD,TIME_WINDOW+1,
+                scanner, producer);*/
+
         joinEventsScenario("""
                 Insert into topicA event X.
                 Delay half the grace period.

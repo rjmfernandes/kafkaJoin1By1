@@ -24,8 +24,6 @@ public class SimpleDummyProducer {
         properties.load(AvroProducer.class.getResourceAsStream("/configuration.properties"));
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please tell topic name for dummy messages:");
-        String topic = scanner.nextLine();
 
         Producer<String, InputTopic> producer = new KafkaProducer<>(properties);
 
@@ -45,13 +43,23 @@ public class SimpleDummyProducer {
                             .setId(DUMMY_ID+partition)
                             .setJoiningDateTime(Instant.now())
                             .build();
-                    ProducerRecord<String, InputTopic> record = new ProducerRecord<>(topic,partition,
+                    ProducerRecord<String, InputTopic> record = new ProducerRecord<>("topicA",partition,
                             DUMMY_ID+partition, inputTopicMessage);
                     producer.send(record, (metadata, e) -> {
                         if (e != null)
                             log.info("Send failed for dummy record {}", record, e);
                         else
-                            log.info("Sent dummy event key={}, id={}, time={} - Partition-{} - Offset {}", record.key(),
+                            log.info("Sent dummy event for topicA key={}, id={}, time={} - Partition-{} - Offset {}", record.key(),
+                                    record.value().getId(), record.value().getJoiningDateTime().getEpochSecond(),
+                                    metadata.partition(), metadata.offset());
+                    });
+                    ProducerRecord<String, InputTopic> record2 = new ProducerRecord<>("topicB",partition,
+                            DUMMY_ID+partition, inputTopicMessage);
+                    producer.send(record2, (metadata, e) -> {
+                        if (e != null)
+                            log.info("Send failed for dummy record {}", record, e);
+                        else
+                            log.info("Sent dummy event for topicB key={}, id={}, time={} - Partition-{} - Offset {}", record.key(),
                                     record.value().getId(), record.value().getJoiningDateTime().getEpochSecond(),
                                     metadata.partition(), metadata.offset());
                     });
