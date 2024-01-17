@@ -125,14 +125,17 @@ Run GracePeriodExplorer to check what you see regarding grace period when using 
 
 - All the scenarios except last one are easily explained considering just if the events time match within the join
   window. The Z one doesn't join because does not match that window.
-- The last W one is a bit unexpected because it shouldn't join considering it elapsed longer than the grace period
+- The last W one can sound a bit unexpected because it shouldn't join considering it elapsed longer than the grace period
   accepts. 
 
 The real cause is the fact that the last left event will be hanging even after the grace period expired until a new
-event enters into the partition or another event enters that it can do join.
+event enters into the partition or another event enters that it can do join. Basically cause time advances on partition 
+marked by new events time coming in. 
 
 So now we can execute in parallel heartbeat coming from SimpleDummyProducer and execute again.
-No join will happen for W event anymore cause the left only event will be emitted before.
+No join will happen for W event anymore cause the left only event will be emitted before for the STREAMED2 
+(cause grace period is only 20s) but for the STREAMED (where no grace period is explicitly defined but by 
+default is 24h) the join will still happen.
 
 ## Payload Time
 
